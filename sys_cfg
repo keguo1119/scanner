@@ -1,0 +1,4 @@
+
+modem0_uart_port  /dev/ttyUSB2
+modem1_uart_port  /dev/ttyUSB7
+modem2_uart_port  /dev/ttyUSB12
