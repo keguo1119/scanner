@@ -1,0 +1,100 @@
+安装：
+
+	1. 参考：http://wiki.ros.org/kinetic/Installation/Ubuntu
+	2. 添加软件源（最好使用国内镜像地址，速度快）：
+
+xunyi@odroid:~$ sudo sh -c '. /etc/lsb-release && echo "deb http://mirrors.ustc.edu.cn/ros/ubuntu/ $DISTRIB_CODENAME main" > /etc/apt/sources.list.d/ros-latest.list'
+
+	1. Set up your keys 
+
+sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+
+          这一步一直出问题，一只以为是需要翻墙的原因，折腾半天，最后发现是因为DNS没有配置好，没有网络，解决：http://blog.csdn.net/seiulaomi/article/details/64920287
+
+root@odroid:/home/xunyi# cat /etc/network/interfaces
+# interfaces(5) file used by ifup(8) and ifdown(8)
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.168.3.49
+netmask 255.255.255.0
+gateway 192.168.3.1
+dns-nameservers 8.8.8.8
+
+#auto wlan0
+#iface wlan0 inet static
+#address 192.168.3.168
+#netmask 255.255.255.0
+#gateway 192.168.3.1
+#wpa-ssid xunyi_debug
+#wpa-psk 6ab5f240fdb67ffa369bffb9dbc307d71701eaa213b58949d1b38918611b1c28
+
+	1. 在非root用户下一步步执行
+
+sudo apt-get update
+sudo apt-get install ros-kinetic-ros-base
+apt-cache search ros-kinetic
+
+sudo rosdep init
+rosdep update
+
+	1. Environment setup
+
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+	1. Dependencies for building packages
+
+sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+
+	1. 检查是否安装成功
+
+xunyi@odroid:~$ roscore
+... logging to /home/xunyi/.ros/log/383ded38-96e4-11e7-826e-001e06324ed8/roslaunch-odroid-7772.log
+Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+
+started roslaunch server http://odroid:40365/
+ros_comm version 1.12.7
+
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: kinetic
+ * /rosversion: 1.12.7
+
+NODES
+
+auto-starting new master
+process[master]: started with pid [7783]
+ROS_MASTER_URI=http://odroid:11311/
+
+setting /run_id to 383ded38-96e4-11e7-826e-001e06324ed8
+process[rosout-1]: started with pid [7796]
+started core service [/rosout]
+
+
+问题记录：
+
+	1. 执行sudo命令时报错：
+
+xunyi@odroid:~$ sudo sh -c '. /etc/lsb-release && echo "deb http://mirrors.ustc.edu.cn/ros/ubuntu/ $DISTRIB_CODENAME main" > /etc/apt/sources.list.d/ros-latest.list'
+[sudo] password for xunyi:
+xunyi is not in the sudoers file.  This incident will be reported.
+          解决方法：root权限下执行：
+root@odroid:/home/xunyi# getent group sudo     // 查看可以sudo的用户
+sudo:x:27:
+root@odroid:/home/xunyi# sudo adduser xunyi sudo
+Adding user `xunyi' to group `sudo' ...
+Adding user xunyi to group sudo
+Done.
+root@odroid:/home/xunyi# getent group sudo     
+sudo:x:27:xunyi
